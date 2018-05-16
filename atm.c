@@ -8,6 +8,8 @@
 #include "include/process.h"
 #include "include/str.h"
 
+#define BUFFERSIZE 1024
+
 void init();
 void save();
 void load();
@@ -20,9 +22,7 @@ redisContext *c;
 
 int main()
 {
-	char *cmd = NULL;
-	size_t len = 0;
-    ssize_t nread;
+	char buf[BUFFERSIZE];
     int status = 0;
 
     redis_connect();
@@ -30,12 +30,15 @@ int main()
         return -1;
 
     for (;;) {
-		nread = getline(&cmd, &len, stdin);
+        memset(buf, 0, BUFFERSIZE);
+		status = readLine(STDIN_FILENO, buf, BUFFERSIZE);
+        if (status <= 0)
+            break;
 
-        status = process_cmd(cmd);
-        if (status) break;
+        status = process_cmd(buf);
+        if (status)
+            break;
     }
-	free(cmd);
     redis_free();
 
     return 0;
@@ -58,12 +61,10 @@ int process_cmd(char *cmd)
     } else if (strcmp(cmd_split[0], "load") == 0) {
         if (tok_count == 3)
             save(cmd_split[1], cmd_split[2]);
-    }
-    /*else if (strcmp(cmd_split[0], "remit") == 0) {
+    } else if (strcmp(cmd_split[0], "remit") == 0) {
         if (tok_count == 4)
             remit(cmd_split[1], cmd_split[2]);
-    }*/
-    else if (strcmp(cmd_split[0], "end") == 0) {
+    } else if (strcmp(cmd_split[0], "end") == 0) {
         exit = 1;
     }
 
@@ -76,10 +77,10 @@ void redis_connect(void)
     c = redisConnect("127.0.0.1", 6379);
     if (c == NULL || c->err) {
         if (c) {
-            printf("Connection error: %s\n", c->errstr);
+            fprintf(stderr, "Connection error: %s\n", c->errstr);
             redisFree(c);
         } else {
-            printf("Connection error: can't allocate redis context\n");
+            fprintf(stderr, "Connection error: can't allocate redis context\n");
         }
     }
 }
@@ -94,7 +95,7 @@ void init(char *account, int money)
     redisReply *reply;
 
     reply = redisCommand(c,"SET %s %d", account, money);
-    freeReplyObject(reply);
+    write(STDOUT_FILENO, "init\n", 5);
 
     freeReplyObject(reply);
 }
@@ -104,7 +105,7 @@ void save(char *account, int money)
     redisReply *reply;
 
     reply = redisCommand(c,"INCRBY %s %d", account, money);
-    freeReplyObject(reply);
+    write(STDOUT_FILENO, "save\n", 5);
 
     freeReplyObject(reply);
 }
@@ -114,17 +115,12 @@ void load(char *account, int money)
     redisReply *reply;
 
     reply = redisCommand(c,"DECRBY %s %d", account, money);
-    freeReplyObject(reply);
+    write(STDOUT_FILENO, "load\n", 5);
 
     freeReplyObject(reply);
 }
 
-/*void remit(char *src_account, char *dst_account, int money)
+void remit(char *src_account, char *dst_account, int money)
 {
-    redisReply *reply;
-
-    reply = redisCommand(c,"SET %s %d", key, value);
-    freeReplyObject(reply);
-
-    freeReplyObject(reply);
-} */
+    write(STDOUT_FILENO, "remit\n", 6);
+}
