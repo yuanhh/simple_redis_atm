@@ -3,8 +3,14 @@ init John 1000
 init Andy 500
 save Alice 1000
 save Andy 2000
+init Danny 1000
+init Tom 2000
 load John 1000
+load Danny 500
 remit Alice John 1500
 remit Andy John 2500
+remit John Danny 4000
+remit Tom Danny 2000
+save Danny 2000
+load Danny 8500
 end
-

@@ -13,7 +13,7 @@ ATM_SOURCE = atm.c process.c str.c
 ATM_OBJECT = $(patsubst %.c, $(OBJ_DIR)/%.o, $(ATM_SOURCE))
 
 CLIENT = client
-CLI_SOURCE = client.c inet.c
+CLI_SOURCE = client_2.c inet.c
 CLI_OBJECT = $(patsubst %.c, $(OBJ_DIR)/%.o, $(CLI_SOURCE))
 
 all: dirs $(SERVER) $(ATM) $(CLIENT)

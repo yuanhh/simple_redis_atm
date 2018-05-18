@@ -1,5 +1,6 @@
 init Alice 1000
 init alice 500
+init aliCe 2000
 init JOHN 500
 init john 1000
 save aLice 1000
@@ -7,6 +8,10 @@ load alIce 1000
 load joHN 1000
 save joHn 500
 load john 1000
+load tom 500
+save tom 500
+init Tom 500
 remit alice BoBo 1000
+remit alice tom 500
+remit john tom 1000
 end
-

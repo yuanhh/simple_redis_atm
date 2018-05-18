@@ -7,12 +7,15 @@
 
 #define PORT "7000"
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int server_fd, conn_fd;
     char *ATM[2] = {"atm", 0};
 
-    server_fd = passive_tcp(NULL, PORT);
+    if (argc == 1)
+        server_fd = passive_tcp(NULL, PORT);
+    else
+        server_fd = passive_tcp(NULL, argv[1]);
 
     setenv("PATH", ".", 1);
 
